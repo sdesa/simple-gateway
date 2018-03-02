@@ -1,6 +1,10 @@
 spring:
   application:
     name: simple-gateway
+
+  profiles:
+    active:
+    - dev
     
   cloud:
     config:
@@ -16,7 +20,7 @@ zuul:
     simple:
       path: /simple/**
 #uncomment this line and comment the line below when running the application locally      
-      url: http://localhost:8081 
+      url: http://localhost:7081 
 #      serviceId: simple-service
 
 ribbon: 
@@ -44,11 +48,42 @@ security:
 eureka:
   client:
     enabled: false
-
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
 endpoints:
   routes:
     sensitive: false
     
 management:
   security:
-    enabled: false    
+    enabled: false
+    
+---
+spring:
+    profiles: dev
+
+zuul:
+  ignoredServices: "*"
+  prefix: /api
+  routes:
+    simple:
+      path: /simple/**
+#uncomment this line and comment the line below when running the application locally      
+#      url: http://localhost:8081 
+      serviceId: simple-service
+
+ribbon: 
+  ConnectTimeout: 30000
+  ReadTimeout: 10000
+  maxAutoRetries: 1
+  MaxAutoRetriesNextServer: 2
+  eureka:
+    enabled: true
+
+#disable registering with eureka when running locally    
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+     
